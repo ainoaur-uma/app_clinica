@@ -56,74 +56,39 @@ Pacientes.findByNHC = (NHC, resultado) => {
   });
 };
 
-// Obtiene un paciente por su nombre
-Pacientes.findByNombre = (nombre, resultado) => {
-  db.query('SELECT * FROM paciente WHERE nombre = ?', nombre, (err, res) => {
-    if (!err) {
-      if (res.length) {
-        resultado(null, res);
-      } else {
-        resultado({ tipo: 'No encontrado' }, null);
-      }
-    } else {
-      resultado(err, null);
+// Actualiza un paciente por su NHC sin borrar datos previos
+Pacientes.updateByNHC = (NHC, newPacienteData, resultado) => {
+  // Primero, obtiene los datos actuales del paciente
+  Pacientes.findByNHC(NHC, (err, currentPaciente) => {
+    if (err) {
+      console.error('Error al obtener el paciente actual:', err);
+      return resultado(err, null);
     }
+
+    if (!currentPaciente) {
+      return resultado({ tipo: 'No encontrado' }, null);
+    }
+
+    // Fusiona los datos actuales con los nuevos datos
+    const updatedPaciente = { ...currentPaciente, ...newPacienteData };
+
+    // Luego, actualiza el paciente en la base de datos
+    db.query(
+      'UPDATE paciente SET ? WHERE NHC = ?',
+      [updatedPaciente, NHC],
+      (err, res) => {
+        if (!err) {
+          if (res.affectedRows === 0) {
+            resultado({ tipo: 'No encontrado' }, null);
+          } else {
+            resultado(null, { NHC, ...updatedPaciente });
+          }
+        } else {
+          resultado(err, null);
+        }
+      }
+    );
   });
-};
-
-// Obtiene pacientes por apellido (buscando en ambas columnas "apellido1" y "apellido2")
-Pacientes.findByApellido = (apellido, resultado) => {
-  db.query(
-    'SELECT * FROM paciente WHERE apellido1 = ? OR apellido2 = ?',
-    [apellido, apellido],
-    (err, res) => {
-      if (!err) {
-        if (res.length) {
-          resultado(null, res);
-        } else {
-          resultado({ tipo: 'No encontrado' }, null);
-        }
-      } else {
-        resultado(err, null);
-      }
-    }
-  );
-};
-
-// Actualiza un paciente por su NHC
-Pacientes.updateByNHC = (NHC, paciente, resultado) => {
-  db.query(
-    'UPDATE paciente SET carnet_identidad = ?, nombre = ?, apellido1 = ?, apellido2 = ?, fecha_nacimiento = ?, telefono = ?, email = ?, departamento = ?, municipio = ?, colonia = ?, direccion = ?, tutor_info = ?, grado = ?, escuela = ?, otra_info = ? WHERE NHC = ?',
-    [
-      paciente.carnet_identidad,
-      paciente.nombre,
-      paciente.apellido1,
-      paciente.apellido2,
-      paciente.fecha_nacimiento,
-      paciente.telefono,
-      paciente.email,
-      paciente.departamento,
-      paciente.municipio,
-      paciente.colonia,
-      paciente.direccion,
-      paciente.tutor_info,
-      paciente.grado,
-      paciente.escuela,
-      paciente.otra_info,
-      NHC,
-    ],
-    (err, res) => {
-      if (!err) {
-        if (res.affectedRows === 0) {
-          resultado({ tipo: 'No encontrado' }, null);
-        } else {
-          resultado(null, { NHC: NHC, ...paciente });
-        }
-      } else {
-        resultado(err, null);
-      }
-    }
-  );
 };
 
 // Elimina un paciente por su NHC

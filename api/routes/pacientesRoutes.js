@@ -11,12 +11,6 @@ router.get('/', pacientesController.findAll);
 // Ruta para obtener un paciente por su NHC
 router.get('/:NHC', pacientesController.findOne);
 
-// Ruta para obtener pacientes por su nombre
-router.get('/nombre/:nombre', pacientesController.findByNombre);
-
-// Ruta para obtener pacientes por su apellido
-router.get('/apellido/:apellido', pacientesController.findByApellido);
-
 // Ruta para actualizar un paciente por su NHC
 router.put('/:NHC', pacientesController.update);
 

@@ -66,80 +66,48 @@ exports.findOne = (req, res) => {
   });
 };
 
-// Obtiene pacientes por su nombre
-exports.findByNombre = (req, res) => {
-  const nombre = req.params.nombre;
-  Pacientes.findByNombre(nombre, (err, pacientes) => {
-    if (err) {
-      console.error('Error al obtener los pacientes por nombre:', err);
-      return res.status(500).json({
-        mensaje: 'Error al obtener los pacientes por nombre',
-        error: err,
-      });
-    }
-    if (!pacientes || pacientes.length === 0) {
-      return res.status(404).json({ mensaje: 'Pacientes no encontrados' });
-    }
-    return res.status(200).json(pacientes);
-  });
-};
-
-// Obtiene pacientes por apellido (buscando en ambas columnas "apellido1" y "apellido2")
-exports.findByApellido = (req, res) => {
-  const apellido = req.params.apellido;
-  Pacientes.findByApellido(apellido, (err, pacientes) => {
-    if (err) {
-      console.error('Error al obtener los pacientes por apellido:', err);
-      return res.status(500).json({
-        mensaje: 'Error al obtener los pacientes por apellido',
-        error: err,
-      });
-    }
-    if (!pacientes || pacientes.length === 0) {
-      return res.status(404).json({ mensaje: 'Pacientes no encontrados' });
-    }
-    return res.status(200).json(pacientes);
-  });
-};
-
 // Actualiza un paciente por su NHC
 exports.update = (req, res) => {
   const NHC = req.params.NHC;
-  const updatedData = {
-    carnet_identidad: req.body.carnet_identidad,
-    nombre: req.body.nombre,
-    apellido1: req.body.apellido1,
-    apellido2: req.body.apellido2,
-    fecha_nacimiento: req.body.fecha_nacimiento,
-    telefono: req.body.telefono,
-    email: req.body.email,
-    departamento: req.body.departamento,
-    municipio: req.body.municipio,
-    colonia: req.body.colonia,
-    direccion: req.body.direccion,
-    tutor_info: req.body.tutor_info,
-    grado: req.body.grado,
-    escuela: req.body.escuela,
-    otra_info: req.body.otra_info,
-  };
 
-  // Lógica para actualizar el paciente
-  Pacientes.updateByNHC(NHC, updatedData, (err, result) => {
+  // Lógica para obtener el paciente actual
+  Pacientes.findByNHC(NHC, (err, currentPaciente) => {
     if (err) {
-      console.error('Error al actualizar el paciente por su NHC:', err);
-      return res.status(500).json({
-        mensaje: 'Error al actualizar el paciente por su NHC',
-        error: err,
-      });
+      console.error('Error al obtener el paciente actual:', err);
+      return res
+        .status(500)
+        .json({ mensaje: 'Error al obtener el paciente actual', error: err });
     }
 
-    if (result.affectedRows === 0) {
+    if (!currentPaciente) {
       return res.status(404).json({ mensaje: 'Paciente no encontrado' });
     }
 
-    return res
-      .status(200)
-      .json({ mensaje: 'Paciente actualizado exitosamente' });
+    const updatedData = req.body;
+
+    // Actualiza toda la información del paciente según los datos proporcionados en la solicitud
+    const updatedPaciente = { ...currentPaciente, ...updatedData };
+
+    // Luego, actualiza el paciente en la base de datos
+    Pacientes.updateByNHC(NHC, updatedPaciente, (err, result) => {
+      if (err) {
+        console.error('Error al actualizar el paciente por su NHC:', err);
+        return res
+          .status(500)
+          .json({
+            mensaje: 'Error al actualizar el paciente por su NHC',
+            error: err,
+          });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ mensaje: 'Paciente no encontrado' });
+      }
+
+      return res
+        .status(200)
+        .json({ mensaje: 'Paciente actualizado exitosamente' });
+    });
   });
 };
 
