@@ -74,46 +74,46 @@ exports.findOne = (req, res) => {
   });
 };
 
-// Actualiza una Historia Clínica Electrónica (HCE) por el NHC del paciente
-exports.update = (req, res) => {
-  const NHC = req.params.NHC;
-  const updatedData = {
-    sexo: req.body.sexo,
-    grupo_sanguineo: req.body.grupo_sanguineo,
-    alergias: req.body.alergias,
-    antecedentes_clinicos: req.body.antecedentes_clinicos,
-    peso: req.body.peso,
-    talla: req.body.talla,
-    IMC: req.body.IMC,
-    pulso: req.body.pulso,
-    SPO2: req.body.SPO2,
-  };
-  // Lógica para actualizar la Historia Clínica Electrónica (HCE)
-  HCE.updateByNHC(NHC, updatedData, (err, result) => {
-    if (err) {
-      console.error(
-        'Error al actualizar la Historia Clínica Electrónica (HCE) por su NHC:',
-        err
-      );
-      return res.status(500).json({
-        mensaje:
-          'Error al actualizar la Historia Clínica Electrónica (HCE) por su NHC',
-        error: err,
-      });
-    }
+// // Actualiza una Historia Clínica Electrónica (HCE) por el NHC del paciente
+// exports.update = (req, res) => {
+//   const NHC = req.params.NHC;
+//   const updatedData = {
+//     sexo: req.body.sexo,
+//     grupo_sanguineo: req.body.grupo_sanguineo,
+//     alergias: req.body.alergias,
+//     antecedentes_clinicos: req.body.antecedentes_clinicos,
+//     peso: req.body.peso,
+//     talla: req.body.talla,
+//     IMC: req.body.IMC,
+//     pulso: req.body.pulso,
+//     SPO2: req.body.SPO2,
+//   };
+//   // Lógica para actualizar la Historia Clínica Electrónica (HCE)
+//   HCE.updateByNHC(NHC, updatedData, (err, result) => {
+//     if (err) {
+//       console.error(
+//         'Error al actualizar la Historia Clínica Electrónica (HCE) por su NHC:',
+//         err
+//       );
+//       return res.status(500).json({
+//         mensaje:
+//           'Error al actualizar la Historia Clínica Electrónica (HCE) por su NHC',
+//         error: err,
+//       });
+//     }
 
-    if (result.affectedRows === 0) {
-      return res
-        .status(404)
-        .json({ mensaje: 'Historia Clínica Electrónica (HCE) no encontrada' });
-    }
+//     if (result.affectedRows === 0) {
+//       return res
+//         .status(404)
+//         .json({ mensaje: 'Historia Clínica Electrónica (HCE) no encontrada' });
+//     }
 
-    return res.status(200).json({
-      mensaje:
-        'Historia Clínica Electrónica (HCE) VERSION1 actualizada exitosamente',
-    });
-  });
-};
+//     return res.status(200).json({
+//       mensaje:
+//         'Historia Clínica Electrónica (HCE) VERSION1 actualizada exitosamente',
+//     });
+//   });
+// };
 
 // Actualiza una Historia Clínica Electrónica (HCE) por el NHC del paciente sin borrar los datos previos
 exports.updateByNHC = (req, res) => {
