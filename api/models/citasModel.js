@@ -48,31 +48,39 @@ Citas.findById = (citaId, resultado) => {
   });
 };
 
-// Actualiza una cita por su ID
-Citas.updateById = (id, cita, resultado) => {
-  db.query(
-    'UPDATE cita SET fecha = ?, hora = ?, NHC = ?, doctor_id = ?, agenda_id = ?, informacion_cita = ? WHERE id = ?',
-    [
-      cita.fecha,
-      cita.hora,
-      cita.NHC,
-      cita.doctor_id,
-      cita.agenda_id,
-      cita.informacion_cita,
-      id,
-    ],
-    (err, res) => {
-      if (!err) {
-        if (res.affectedRows === 0) {
-          resultado({ tipo: 'No encontrado' }, null);
-        } else {
-          resultado(null, { id: id, ...cita });
-        }
-      } else {
-        resultado(err, null);
-      }
+// Actualiza una cita por su ID sin borrar datos previos
+Citas.updateById = (id, newCitaData, resultado) => {
+  // Primero, obtiene los datos actuales de la cita
+  Citas.findById(id, (err, currentCita) => {
+    if (err) {
+      console.error('Error al obtener la cita actual:', err);
+      return resultado(err, null);
     }
-  );
+
+    if (!currentCita) {
+      return resultado({ tipo: 'No encontrado' }, null);
+    }
+
+    // Fusiona los datos actuales con los nuevos datos
+    const updatedCita = { ...currentCita, ...newCitaData };
+
+    // Luego, actualiza la cita en la base de datos
+    db.query(
+      'UPDATE cita SET ? WHERE id = ?',
+      [updatedCita, id],
+      (err, res) => {
+        if (!err) {
+          if (res.affectedRows === 0) {
+            resultado({ tipo: 'No encontrado' }, null);
+          } else {
+            resultado(null, { id: id, ...updatedCita });
+          }
+        } else {
+          resultado(err, null);
+        }
+      }
+    );
+  });
 };
 
 // Elimina una cita por su ID

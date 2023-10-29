@@ -1,7 +1,7 @@
 // Importar el modelo
 const Citas = require('../models/citasModel');
 
-// Crea una nueva cita: inserta una nueva cita en la bd
+// Crea una nueva cita: inserta una nueva cita en la base de datos
 exports.create = (req, res) => {
   // Obtiene los datos de la nueva cita desde la solicitud (req.body)
   const nuevaCita = {
@@ -25,7 +25,7 @@ exports.create = (req, res) => {
   });
 };
 
-// Obtiene todas las citas de la bd
+// Obtiene todas las citas de la base de datos
 exports.findAll = (req, res) => {
   Citas.getAll((err, citas) => {
     if (err) {
@@ -58,29 +58,43 @@ exports.findOne = (req, res) => {
 // Actualiza una cita por su ID
 exports.update = (req, res) => {
   const citaId = req.params.citaId;
-  const updatedData = {
-    fecha: req.body.fecha,
-    hora: req.body.hora,
-    NHC: req.body.NHC,
-    doctor_id: req.body.doctor_id,
-    agenda_id: req.body.agenda_id,
-    informacion_cita: req.body.informacion_cita,
-  };
-  // Lógica para actualizar la cita
-  Citas.updateById(citaId, updatedData, (err, result) => {
+
+  // Lógica para obtener la cita actual
+  Citas.findById(citaId, (err, currentCita) => {
     if (err) {
-      console.error('Error al actualizar la cita por su ID:', err);
-      return res.status(500).json({
-        mensaje: 'Error al actualizar la cita por su ID',
-        error: err,
-      });
+      console.error('Error al obtener la cita actual:', err);
+      return res
+        .status(500)
+        .json({ mensaje: 'Error al obtener la cita actual', error: err });
     }
 
-    if (result.affectedRows === 0) {
+    if (!currentCita) {
       return res.status(404).json({ mensaje: 'Cita no encontrada' });
     }
 
-    return res.status(200).json({ mensaje: 'Cita actualizada exitosamente' });
+    const updatedData = req.body;
+
+    // Actualiza toda la cita según los datos proporcionados en la solicitud
+    const updatedCita = { ...currentCita, ...updatedData };
+
+    // Luego, actualiza la cita en la base de datos
+    Citas.updateById(citaId, updatedCita, (err, result) => {
+      if (err) {
+        console.error('Error al actualizar la cita por su ID:', err);
+        return res
+          .status(500)
+          .json({
+            mensaje: 'Error al actualizar la cita por su ID',
+            error: err,
+          });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ mensaje: 'Cita no encontrada' });
+      }
+
+      return res.status(200).json({ mensaje: 'Cita actualizada exitosamente' });
+    });
   });
 };
 
