@@ -74,75 +74,57 @@ exports.findOne = (req, res) => {
   });
 };
 
-// // Actualiza una Historia Clínica Electrónica (HCE) por el NHC del paciente
-// exports.update = (req, res) => {
-//   const NHC = req.params.NHC;
-//   const updatedData = {
-//     sexo: req.body.sexo,
-//     grupo_sanguineo: req.body.grupo_sanguineo,
-//     alergias: req.body.alergias,
-//     antecedentes_clinicos: req.body.antecedentes_clinicos,
-//     peso: req.body.peso,
-//     talla: req.body.talla,
-//     IMC: req.body.IMC,
-//     pulso: req.body.pulso,
-//     SPO2: req.body.SPO2,
-//   };
-//   // Lógica para actualizar la Historia Clínica Electrónica (HCE)
-//   HCE.updateByNHC(NHC, updatedData, (err, result) => {
-//     if (err) {
-//       console.error(
-//         'Error al actualizar la Historia Clínica Electrónica (HCE) por su NHC:',
-//         err
-//       );
-//       return res.status(500).json({
-//         mensaje:
-//           'Error al actualizar la Historia Clínica Electrónica (HCE) por su NHC',
-//         error: err,
-//       });
-//     }
-
-//     if (result.affectedRows === 0) {
-//       return res
-//         .status(404)
-//         .json({ mensaje: 'Historia Clínica Electrónica (HCE) no encontrada' });
-//     }
-
-//     return res.status(200).json({
-//       mensaje:
-//         'Historia Clínica Electrónica (HCE) VERSION1 actualizada exitosamente',
-//     });
-//   });
-// };
-
-// Actualiza una Historia Clínica Electrónica (HCE) por el NHC del paciente sin borrar los datos previos
-exports.updateByNHC = (req, res) => {
+// Actualiza una Historia Clínica Electrónica (HCE) por el NHC del paciente
+exports.update = (req, res) => {
   const NHC = req.params.NHC;
-  const updatedData = req.body; // Usa todo el cuerpo de la solicitud para la actualización
 
-  // Lógica para actualizar la Historia Clínica Electrónica (HCE) por NHC sin borrar datos previos
-  HCE.updateByNHC(NHC, updatedData, (err, result) => {
+  // Lógica para actualizar la Historia Clínica Electrónica (HCE)
+  HCE.findByNHC(NHC, (err, currentHCE) => {
     if (err) {
-      console.error(
-        'Error al actualizar la Historia Clínica Electrónica (HCE) por su NHC:',
-        err
-      );
+      console.error('Error al obtener la HCE actual:', err);
       return res.status(500).json({
         mensaje:
-          'Error al actualizar la Historia Clínica Electrónica (HCE) por su NHC',
+          'Error al obtener la Historia Clínica Electrónica (HCE) actual',
         error: err,
       });
     }
 
-    if (result.affectedRows === 0) {
-      return res
-        .status(404)
-        .json({ mensaje: 'Historia Clínica Electrónica (HCE) no encontrada' });
+    if (!currentHCE) {
+      return res.status(404).json({
+        mensaje: 'Historia Clínica Electrónica (HCE) no encontrada',
+      });
     }
 
-    return res.status(200).json({
-      mensaje:
-        'Historia Clínica Electrónica (HCE) VERSION2 actualizada exitosamente',
+    const updatedData = req.body;
+
+    // Actualiza solo los campos proporcionados en la solicitud
+    const updatedHCE = { ...currentHCE, ...updatedData };
+
+    // Luego, actualiza la HCE en la base de datos
+    HCE.updateByNHC(NHC, updatedHCE, (err, result) => {
+      if (err) {
+        console.error(
+          'Error al actualizar la Historia Clínica Electrónica (HCE) por su NHC:',
+          err
+        );
+        return res.status(500).json({
+          mensaje:
+            'Error al actualizar la Historia Clínica Electrónica (HCE) por su NHC',
+          error: err,
+        });
+      }
+
+      if (result.affectedRows === 0) {
+        return res
+          .status(404)
+          .json({
+            mensaje: 'Historia Clínica Electrónica (HCE) no encontrada',
+          });
+      }
+
+      return res.status(200).json({
+        mensaje: 'Historia Clínica Electrónica (HCE) actualizada exitosamente',
+      });
     });
   });
 };
@@ -183,5 +165,4 @@ module.exports = {
   findOne: exports.findOne,
   update: exports.update,
   delete: exports.delete,
-  updateByNHC: exports.updateByNHC,
 };

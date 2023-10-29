@@ -12,7 +12,7 @@ router.get('/', hceController.findAll);
 router.get('/:NHC', hceController.findOne);
 
 // Ruta para actualizar una Historia Clínica Electrónica (HCE) por el NHC del paciente
-router.put('/:NHC', hceController.updateByNHC);
+router.put('/:NHC', hceController.update);
 
 // Ruta para eliminar una Historia Clínica Electrónica (HCE) por el NHC del paciente
 router.delete('/:NHC', hceController.delete);
