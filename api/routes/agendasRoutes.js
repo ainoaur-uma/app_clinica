@@ -12,7 +12,7 @@ router.get('/', agendasController.findAll);
 router.get('/:agendaId', agendasController.findOne);
 
 // Ruta para actualizar una agenda por su ID
-router.put('/:agendaId', agendasController.updateById);
+router.put('/:agendaId', agendasController.update);
 
 // Ruta para eliminar una agenda por su ID
 router.delete('/:agendaId', agendasController.delete);

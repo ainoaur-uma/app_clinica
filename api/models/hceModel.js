@@ -50,7 +50,7 @@ HCE.findByNHC = (NHC, resultado) => {
   });
 };
 
-// Actualiza una Historia Clínica Electrónica (HCE) por el NHC del paciente
+// Actualiza una Historia Clínica Electrónica (HCE) por el NHC del paciente sin borrar datos previos
 HCE.updateByNHC = (NHC, newHCEData, resultado) => {
   // Primero, obtiene los datos actuales de la HCE
   HCE.findByNHC(NHC, (err, currentHCE) => {

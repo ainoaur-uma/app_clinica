@@ -51,15 +51,11 @@ exports.findOne = (req, res) => {
   });
 };
 
-// Actualiza una agenda por su ID sin borrar datos previos
-exports.updateById = (req, res) => {
+// Actualiza una agenda por su ID
+exports.update = (req, res) => {
   const agendaId = req.params.agendaId;
-  const updatedData = {
-    descripcion: req.body.descripcion,
-    horario: req.body.horario,
-  };
 
-  // Lógica para actualizar la agenda por ID sin borrar datos previos
+  // Lógica para obtener la agenda actual
   Agendas.findById(agendaId, (err, currentAgenda) => {
     if (err) {
       console.error('Error al obtener la agenda actual:', err);
@@ -73,7 +69,9 @@ exports.updateById = (req, res) => {
       return res.status(404).json({ mensaje: 'Agenda no encontrada' });
     }
 
-    // Fusiona los datos actuales con los nuevos datos
+    const updatedData = req.body;
+
+    // Actualiza toda la agenda según los datos proporcionados en la solicitud
     const updatedAgenda = { ...currentAgenda, ...updatedData };
 
     // Luego, actualiza la agenda en la base de datos
@@ -122,6 +120,6 @@ module.exports = {
   create: exports.create,
   findAll: exports.findAll,
   findOne: exports.findOne,
-  updateById: exports.updateById,
+  update: exports.update,
   delete: exports.delete,
 };
