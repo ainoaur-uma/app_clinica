@@ -55,72 +55,51 @@ exports.findOne = (req, res) => {
   });
 };
 
-// Obtiene un medicamento por su nombre
-exports.findByNombre = (req, res) => {
-  const nombre = req.params.nombre;
-  Medicamentos.findByNombre(nombre, (err, medicamentos) => {
-    if (err) {
-      console.error('Error al obtener los medicamentos por nombre:', err);
-      return res.status(500).json({
-        mensaje: 'Error al obtener los medicamentos por nombre',
-        error: err,
-      });
-    }
-    if (!medicamentos || medicamentos.length === 0) {
-      return res.status(404).json({ mensaje: 'Medicamentos no encontrados' });
-    }
-    return res.status(200).json(medicamentos);
-  });
-};
-
-// Obtiene un medicamento por su principio activo
-exports.findByPrincipioActivo = (req, res) => {
-  const principioActivo = req.params.principioActivo;
-  Medicamentos.findByPrincipioActivo(principioActivo, (err, medicamentos) => {
-    if (err) {
-      console.error(
-        'Error al obtener los medicamentos por principio activo:',
-        err
-      );
-      return res.status(500).json({
-        mensaje: 'Error al obtener los medicamentos por principio activo',
-        error: err,
-      });
-    }
-    if (!medicamentos || medicamentos.length === 0) {
-      return res.status(404).json({ mensaje: 'Medicamentos no encontrados' });
-    }
-    return res.status(200).json(medicamentos);
-  });
-};
-
 // Actualiza un medicamento por su ID
 exports.update = (req, res) => {
   const medicamentoId = req.params.medicamentoId;
-  const updatedData = {
-    nombre_medicamento: req.body.nombre_medicamento,
-    principio_activo: req.body.principio_activo,
-    descripcion_medicamento: req.body.descripcion_medicamento,
-    fecha_caducidad: req.body.fecha_caducidad,
-    forma_dispensacion: req.body.forma_dispensacion,
-  };
-  // Lógica para actualizar el medicamento
-  Medicamentos.updateById(medicamentoId, updatedData, (err, result) => {
+
+  // Lógica para obtener el medicamento actual
+  Medicamentos.findById(medicamentoId, (err, currentMedicamento) => {
     if (err) {
-      console.error('Error al actualizar el medicamento por su ID:', err);
+      console.error('Error al obtener el medicamento actual:', err);
       return res.status(500).json({
-        mensaje: 'Error al actualizar el medicamento por su ID',
+        mensaje: 'Error al obtener el medicamento actual',
         error: err,
       });
     }
 
-    if (result.affectedRows === 0) {
+    if (!currentMedicamento) {
       return res.status(404).json({ mensaje: 'Medicamento no encontrado' });
     }
 
-    return res
-      .status(200)
-      .json({ mensaje: 'Medicamento actualizado exitosamente' });
+    const updatedData = req.body;
+
+    // Actualiza todo el medicamento según los datos proporcionados en la solicitud
+    const updatedMedicamento = { ...currentMedicamento, ...updatedData };
+
+    // Luego, actualiza el medicamento en la base de datos
+    Medicamentos.updateById(
+      medicamentoId,
+      updatedMedicamento,
+      (err, result) => {
+        if (err) {
+          console.error('Error al actualizar el medicamento por su ID:', err);
+          return res.status(500).json({
+            mensaje: 'Error al actualizar el medicamento por su ID',
+            error: err,
+          });
+        }
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ mensaje: 'Medicamento no encontrado' });
+        }
+
+        return res
+          .status(200)
+          .json({ mensaje: 'Medicamento actualizado exitosamente' });
+      }
+    );
   });
 };
 
@@ -152,9 +131,6 @@ module.exports = {
   create: exports.create,
   findAll: exports.findAll,
   findOne: exports.findOne,
-  findByNombre: exports.findByNombre,
-  findByPrincipioActivo: exports.findByPrincipioActivo,
   update: exports.update,
   delete: exports.delete,
-  findByPrincipioActivo: exports.findByPrincipioActivo,
 };

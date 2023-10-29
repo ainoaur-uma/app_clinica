@@ -1,6 +1,7 @@
 const db = require('../../server/db_connection');
 
 const Medicamentos = function (medicamento) {
+  this.id = medicamento.id;
   this.nombre_medicamento = medicamento.nombre_medicamento;
   this.principio_activo = medicamento.principio_activo;
   this.descripcion_medicamento = medicamento.descripcion_medicamento;
@@ -19,7 +20,7 @@ Medicamentos.create = (nuevoMedicamento, resultado) => {
   });
 };
 
-//Obtiene todos lo medicamentos
+// Obtiene todos los medicamentos
 Medicamentos.getAll = (resultado) => {
   db.query('SELECT * FROM medicamento', (err, res) => {
     if (!err) {
@@ -30,90 +31,57 @@ Medicamentos.getAll = (resultado) => {
   });
 };
 
-//Obtiene un medicamento por su ID
-Medicamentos.findById = (medicamentoId, resultado) => {
-  db.query(
-    'SELECT * FROM medicamento WHERE id = ?',
-    medicamentoId,
-    (err, res) => {
-      if (!err) {
-        if (res.length) {
-          resultado(null, res[0]);
-        } else {
-          resultado({ tipo: 'No encontrado' }, null);
-        }
+// Obtiene un medicamento por su ID
+Medicamentos.findById = (id, resultado) => {
+  db.query('SELECT * FROM medicamento WHERE id = ?', id, (err, res) => {
+    if (!err) {
+      if (res.length) {
+        resultado(null, res[0]);
       } else {
-        resultado(err, null);
+        resultado({ tipo: 'No encontrado' }, null);
       }
+    } else {
+      resultado(err, null);
     }
-  );
+  });
 };
 
-// Obtiene un medicamento por su nombre
-Medicamentos.findByNombre = (nombre, resultado) => {
-  db.query(
-    'SELECT * FROM medicamento WHERE nombre_medicamento = ?',
-    nombre,
-    (err, res) => {
-      if (!err) {
-        if (res.length) {
-          resultado(null, res);
-        } else {
-          resultado({ tipo: 'No encontrado' }, null);
-        }
-      } else {
-        resultado(err, null);
-      }
+// Actualiza un medicamento por su ID sin borrar datos previos
+Medicamentos.updateById = (id, newMedicamentoData, resultado) => {
+  // Primero, obtiene los datos actuales del medicamento
+  Medicamentos.findById(id, (err, currentMedicamento) => {
+    if (err) {
+      console.error('Error al obtener el medicamento actual:', err);
+      return resultado(err, null);
     }
-  );
+
+    if (!currentMedicamento) {
+      return resultado({ tipo: 'No encontrado' }, null);
+    }
+
+    // Fusiona los datos actuales con los nuevos datos
+    const updatedMedicamento = { ...currentMedicamento, ...newMedicamentoData };
+
+    // Luego, actualiza el medicamento en la base de datos
+    db.query(
+      'UPDATE medicamento SET ? WHERE id = ?',
+      [updatedMedicamento, id],
+      (err, res) => {
+        if (!err) {
+          if (res.affectedRows === 0) {
+            resultado({ tipo: 'No encontrado' }, null);
+          } else {
+            resultado(null, { id: id, ...updatedMedicamento });
+          }
+        } else {
+          resultado(err, null);
+        }
+      }
+    );
+  });
 };
 
-// Obtiene un medicamento por su principio activo
-Medicamentos.findByPrincipioActivo = (principioActivo, resultado) => {
-  db.query(
-    'SELECT * FROM medicamento WHERE principio_activo = ?',
-    principioActivo,
-    (err, res) => {
-      if (!err) {
-        if (res.length) {
-          resultado(null, res);
-        } else {
-          resultado({ tipo: 'No encontrado' }, null);
-        }
-      } else {
-        resultado(err, null);
-      }
-    }
-  );
-};
-
-//Actualiza un medicamento por su ID
-Medicamentos.updateById = (id, medicamento, resultado) => {
-  db.query(
-    'UPDATE medicamento SET nombre_medicamento = ?, principio_activo = ?, descripcion_medicamento = ?, fecha_caducidad = ?, forma_dispensacion = ? WHERE id = ?',
-    [
-      medicamento.nombre_medicamento,
-      medicamento.principio_activo,
-      medicamento.descripcion_medicamento,
-      medicamento.fecha_caducidad,
-      medicamento.forma_dispensacion,
-      id,
-    ],
-    (err, res) => {
-      if (!err) {
-        if (res.affectedRows === 0) {
-          resultado({ tipo: 'No encontrado' }, null);
-        } else {
-          resultado(null, { id: id, ...medicamento });
-        }
-      } else {
-        resultado(err, null);
-      }
-    }
-  );
-};
-
-//Elimina un medicamento por su ID
+// Elimina un medicamento por su ID
 Medicamentos.remove = (id, resultado) => {
   db.query('DELETE FROM medicamento WHERE id = ?', id, (err, res) => {
     if (!err) {

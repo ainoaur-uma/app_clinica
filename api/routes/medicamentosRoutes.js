@@ -11,15 +11,6 @@ router.get('/', medicamentosController.findAll);
 // Ruta para obtener un medicamento por su ID
 router.get('/:medicamentoId', medicamentosController.findOne);
 
-// Ruta para obtener un medicamento por su nombre
-router.get('/nombre/:nombre', medicamentosController.findByNombre);
-
-// Ruta para obtener un medicamento por su principio activo
-router.get(
-  '/principio-activo/:principioActivo',
-  medicamentosController.findByPrincipioActivo
-);
-
 // Ruta para actualizar un medicamento por su ID
 router.put('/:medicamentoId', medicamentosController.update);
 
