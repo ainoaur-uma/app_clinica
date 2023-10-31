@@ -2,10 +2,10 @@
   "name": "clinica",
   "version": "1.0.0",
   "description": "version 1 de la app de la clinica ",
-  "main": "app.js",
+  "main": "server/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "nodemon server/server.js"
   },
   "author": "ainoa",
   "license": "ISC",
