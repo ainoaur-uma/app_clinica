@@ -37,7 +37,7 @@ exports.create = (req, res) => {
 
 // Obtiene todos los usuarios de la base de datos
 exports.findAll = (req, res) => {
-  Usuario.getAll((err, usuarios) => {
+  Usuarios.getAll((err, usuarios) => {
     if (err) {
       console.error('Error al obtener los usuarios:', err);
       return res

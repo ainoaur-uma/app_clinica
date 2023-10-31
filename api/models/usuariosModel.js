@@ -1,6 +1,6 @@
 const db = require('../../server/db_connection');
 
-const Usuario = function (usuario) {
+const Usuarios = function (usuario) {
   this.id = usuario.id;
   this.username = usuario.username;
   this.password = usuario.password;
@@ -21,7 +21,7 @@ const Usuario = function (usuario) {
 };
 
 // Crea un nuevo usuario
-Usuario.create = (nuevoUsuario, resultado) => {
+Usuarios.create = (nuevoUsuario, resultado) => {
   db.query('INSERT INTO usuario SET ?', nuevoUsuario, (err, res) => {
     if (!err) {
       resultado(null, { id: res.insertId, ...nuevoUsuario });
@@ -32,7 +32,7 @@ Usuario.create = (nuevoUsuario, resultado) => {
 };
 
 // Obtiene todos los usuarios
-Usuario.getAll = (resultado) => {
+Usuarios.getAll = (resultado) => {
   db.query('SELECT * FROM usuario', (err, res) => {
     if (!err) {
       resultado(null, res);
@@ -43,7 +43,7 @@ Usuario.getAll = (resultado) => {
 };
 
 // Obtiene un usuario por su ID
-Usuario.findById = (id, resultado) => {
+Usuarios.findById = (id, resultado) => {
   db.query('SELECT * FROM usuario WHERE id = ?', id, (err, res) => {
     if (!err) {
       if (res.length) {
@@ -58,7 +58,7 @@ Usuario.findById = (id, resultado) => {
 };
 
 // Actualiza un usuario por su ID sin borrar datos previos
-Usuario.updateById = (id, newUsuarioData, resultado) => {
+Usuarios.updateById = (id, newUsuarioData, resultado) => {
   // Primero, obtiene los datos actuales del usuario
   Usuario.findById(id, (err, currentUsuario) => {
     if (err) {
@@ -93,7 +93,7 @@ Usuario.updateById = (id, newUsuarioData, resultado) => {
 };
 
 // Elimina un usuario por su ID
-Usuario.remove = (id, resultado) => {
+Usuarios.remove = (id, resultado) => {
   db.query('DELETE FROM usuario WHERE id = ?', id, (err, res) => {
     if (!err) {
       if (res.affectedRows === 0) {
@@ -107,4 +107,4 @@ Usuario.remove = (id, resultado) => {
   });
 };
 
-module.exports = Usuario;
+module.exports = Usuarios;
