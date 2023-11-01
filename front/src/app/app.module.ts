@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { EpisodiosComponent } from './components/episodios/episodios.component';
 import { HceComponent } from './components/hce/hce.component';
@@ -16,7 +15,6 @@ import { PacientesComponent } from './components/pacientes/pacientes.component';
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
     UsuariosComponent,
     EpisodiosComponent,
     HceComponent,
