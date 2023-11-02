@@ -1,1 +1,9 @@
 <p>agendas works!</p>
+<h2>Listado de Agendas</h2>
+
+<ul>
+  <li *ngFor="let agenda of agendas">
+    <strong>Descripción:</strong> {{ agenda.descripcion }}<br>
+    <strong>Horario:</strong> {{ agenda.horario }}
+  </li>
+</ul>

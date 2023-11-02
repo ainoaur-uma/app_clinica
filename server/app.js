@@ -3,9 +3,17 @@ const app = express();
 const bodyParser = require('body-parser');
 const dbConnection = require('./db_connection');
 const dotenv = require('dotenv').config();
+const path = require('path');
+const cors = require('cors');
 
 // Parse application/json
 app.use(bodyParser.json());
+
+// Ruta para servir archivos estáticos de Angular
+app.use(express.static(path.join(__dirname, 'front/dist/index.html')));
+
+//cors:
+app.use(cors());
 
 // Importa las rutas de las entidades
 const usuariosRoutes = require('../api/routes/usuariosRoutes');
@@ -34,4 +42,8 @@ app.get('/', (req, res) => {
   res.send('¡Bienvenido a la aplicación de la clínica!');
 });
 
+// Ruta para servir la aplicación Angular
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'front/dist/index.html'));
+});
 module.exports = app;
