@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AgendasService } from '../../services/agendas.service';
-import { Agenda } from '../../services/agendas.service';
+import { AgendasService, Agenda } from '../../services/agendas.service';
+
 
 @Component({
   selector: 'app-agendas',
@@ -14,9 +14,8 @@ export class AgendasComponent implements OnInit {
 
   ngOnInit(): void {
     // Este método se ejecuta cuando el componente se inicia
-    // Aquí puedes llamar a métodos del servicio para cargar datos, por ejemplo, al iniciar la página
-
-    // Llama al método del servicio para obtener todas las agendas
+   
+    // Llamar al método del servicio para obtener todas las agendas
     this.agendasService.getAgendas().subscribe((data: Agenda[]) => {
       this.agendas = data; // Asigna los datos obtenidos del servicio a la propiedad 'agendas'
     });
